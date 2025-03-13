@@ -1,0 +1,25 @@
+#!/bin/sh
+
+case "$1" in
+        start)
+                echo "Starting theramin"
+                cd /lib/modules/custom/extra
+                ./tof1020_load
+                start-stop-daemon -S -n raspi_theramin -a /usr/bin/raspi_theramin -- -d
+                ;;
+        stop)
+                echo "Stoping theramin"
+                start-stop-daemon -K -n raspi_theramin
+                cd /lib/modules/custom/extra
+                ./tof1020_unload
+                ;;
+        restart|reload)
+                "$0" stop
+                "$0" start
+                ;;
+        *)
+        echo "Usage: $0 {start|stop|restart}"
+        exit 1
+esac
+
+exit $?
