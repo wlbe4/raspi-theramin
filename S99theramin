@@ -6,6 +6,7 @@ case "$1" in
                 cd /lib/modules/custom/extra
                 modprobe i2c-bcm2835
                 modprobe i2c-dev
+                modprobe snd-usb-audio
                 ./tof1020_load
                 start-stop-daemon -S -n raspi_theramin -a /usr/bin/raspi_theramin -- -d
                 ;;
@@ -14,6 +15,7 @@ case "$1" in
                 start-stop-daemon -K -n raspi_theramin
                 cd /lib/modules/custom/extra
                 ./tof1020_unload
+                rmmod snd-usb-audio
                 rmmod i2c-dev
                 rmmod i2c-bcm2835
                 ;;
