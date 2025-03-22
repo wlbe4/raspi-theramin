@@ -19,7 +19,55 @@
 #include <linux/types.h>
 #include <linux/cdev.h>
 #include <linux/fs.h> // file_operations
+#include <linux/i2c.h>
 #include "tof1020.h"
+
+#define I2C_BUS     1    // I2C bus number
+#define I2C_ADDR    0x52 // I2C device address for ToF1020
+#define REG_ADDR    0x00 // Register to read
+
+static struct i2c_adapter *adapter;
+
+static int tof1020_get_distance(uint16_t *distance)
+{
+    struct i2c_msg msgs[2];
+    uint8_t reg = REG_ADDR;
+    uint8_t data[2]; // Buffer to store read data
+    int ret;
+
+    // Get the I2C adapter
+    adapter = i2c_get_adapter(I2C_BUS);
+    if (!adapter) {
+        pr_err("Failed to get I2C adapter %d\n", I2C_BUS);
+        return -ENODEV;
+    }
+
+    // First message: Send the register address
+    msgs[0].addr  = I2C_ADDR;
+    msgs[0].flags = 0; // Write
+    msgs[0].len   = 1;
+    msgs[0].buf   = &reg;
+
+    // Second message: Read 2 bytes from the device
+    msgs[1].addr  = I2C_ADDR;
+    msgs[1].flags = I2C_M_RD;
+    msgs[1].len   = 2;
+    msgs[1].buf   = data;
+
+    // Perform I2C transaction
+    ret = i2c_transfer(adapter, msgs, 2);
+    if (ret < 0) {
+        pr_err("I2C read failed\n");
+        *distance = 0;
+    } else {
+        pr_info("Read data: 0x%02x 0x%02x\n", data[0], data[1]);
+        *distance = ((uint16_t)data[0]<<8) | data[1];
+    }
+
+    // Release the adapter
+    i2c_put_adapter(adapter);
+    return 0;
+}
 
 
 int tof1020_major =   0; // use dynamic major
@@ -51,7 +99,8 @@ ssize_t tof1020_read(struct file *filp, char __user *buf, size_t count,
                 loff_t *f_pos)
 {
     ssize_t bytes_to_copy = 2;
-    uint16_t val = 0x1234;
+    uint16_t val;
+    tof1020_get_distance(&val);
     PDEBUG("read %zu bytes with offset %lld",count,*f_pos);
     if (*f_pos >= 2 ) {
         return 0;
