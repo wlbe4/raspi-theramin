@@ -19,9 +19,11 @@ typedef struct {
 #define MAX_TOF_VAL     0x180
 #define MOUT_CH         2 // MIDI 0-15 is mapped to device midi channel 1-16
 #define NORM_VELOCITY   64
-#define FROM_NOTE   pitchC3
-#define TO_NOTE     pitchC4
-#define NOTE_RANGE (TO_NOTE-FROM_NOTE)
+const char notes_to_play[] = {
+    pitchC3, pitchD3, pitchE3, pitchF3, pitchG3,
+    pitchA3, pitchB3, pitchC4
+};
+#define TOTAL_NOTES (sizeof(notes_to_play) / sizeof(notes_to_play[0]))
 
 // The channel range is 0-15
 // The control range is 0-119.
@@ -63,7 +65,8 @@ void play_note(snd_rawmidi_t * midiout, char note)
 
 void play_val(snd_rawmidi_t * midiout, uint16_t val, uint16_t max_val)
 {
-    char note = FROM_NOTE + (NOTE_RANGE * val / max_val);
+    int note_idx = 0 + (TOTAL_NOTES * val / max_val);
+    char note = notes_to_play[note_idx];
     play_note(midiout, note);
 }
 
@@ -89,6 +92,10 @@ int main(int argc, char const *argv[])
 
     while (val) {
         if (pread(tof1020file, &val,sizeof(val),0) == sizeof(val)) {
+            if (val == -1) {
+                val = 1;
+                continue;
+            }
             if (abs(prev_val-val) > 50) {
                 printf("Read from ToF value: 0x%x\n",val);
                 prev_val = val;
@@ -99,7 +106,7 @@ int main(int argc, char const *argv[])
         } else {
             fprintf(stderr, "Failed to read 2 bytes from %s\n",TOF1020_DEV);
         }
-        usleep(100*1000); // Sample distance with 10Hz
+        usleep(50*1000); // Sample distance with 20Hz
     }
 #if 0
     play_note(midiout, pitchG3); usleep(200*1000);

@@ -58,7 +58,7 @@ static int tof1020_get_distance(uint16_t *distance)
     ret = i2c_transfer(adapter, msgs, 2);
     if (ret < 0) {
         pr_err("I2C read failed\n");
-        *distance = 0;
+        *distance = -1;
     } else {
         pr_info("Read data: 0x%02x 0x%02x\n", data[0], data[1]);
         *distance = ((uint16_t)data[0]<<8) | data[1];
