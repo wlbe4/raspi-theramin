@@ -108,39 +108,7 @@ int main(int argc, char const *argv[])
         }
         usleep(50*1000); // Sample distance with 20Hz
     }
-#if 0
-    play_note(midiout, pitchG3); usleep(200*1000);
-    play_note(midiout, pitchE3); usleep(200*1000);
-    play_note(midiout, pitchE3); usleep(200*1000);
-    usleep(300*1000);
-    play_note(midiout, pitchF3); usleep(200*1000);
-    play_note(midiout, pitchD3); usleep(200*1000);
-    play_note(midiout, pitchD3); usleep(200*1000);
-    usleep(300*1000);
-    play_note(midiout, pitchC3); usleep(200*1000);
-    play_note(midiout, pitchD3); usleep(200*1000);
-    play_note(midiout, pitchE3); usleep(200*1000);
-    play_note(midiout, pitchF3); usleep(200*1000);
-    play_note(midiout, pitchG3); usleep(200*1000);
-    play_note(midiout, pitchG3); usleep(200*1000);
-    play_note(midiout, pitchG3); usleep(200*1000);
-    usleep(300*1000);
 
-    play_note(midiout, pitchG3); usleep(200*1000);
-    play_note(midiout, pitchE3); usleep(200*1000);
-    play_note(midiout, pitchE3); usleep(200*1000);
-    usleep(300*1000);
-    play_note(midiout, pitchF3); usleep(200*1000);
-    play_note(midiout, pitchD3); usleep(200*1000);
-    play_note(midiout, pitchD3); usleep(200*1000);
-    usleep(300*1000);
-    play_note(midiout, pitchC3); usleep(200*1000);
-    play_note(midiout, pitchE3); usleep(200*1000);
-    play_note(midiout, pitchG3); usleep(200*1000);
-    play_note(midiout, pitchG3); usleep(200*1000);
-    play_note(midiout, pitchC3); usleep(200*1000);
-    usleep(300*1000);
-#endif
     // Close MIDI device
     if ((status = snd_rawmidi_close(midiout)) < 0) {
         fprintf(stderr, "Failed to close MIDI: %s\n",snd_strerror(status));
